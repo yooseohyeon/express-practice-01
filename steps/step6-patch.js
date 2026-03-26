@@ -17,7 +17,7 @@
  *     -d '{"price": 12900}'
  */
 
-import express from 'express';
+import express from "express";
 
 const app = express();
 const PORT = 8080;
@@ -26,23 +26,43 @@ app.use(express.json());
 
 // 임시 데이터
 let subscriptions = [
-  { id: 1, service: 'Netflix', price: 9900, cycle: 'monthly', startDate: '2024-01-01' },
-  { id: 2, service: 'YouTube Premium', price: 14900, cycle: 'monthly', startDate: '2024-01-15' },
-  { id: 3, service: 'Spotify', price: 10900, cycle: 'monthly', startDate: '2024-02-01' },
+  {
+    id: 1,
+    service: "Netflix",
+    price: 9900,
+    cycle: "monthly",
+    startDate: "2024-01-01",
+  },
+  {
+    id: 2,
+    service: "YouTube Premium",
+    price: 14900,
+    cycle: "monthly",
+    startDate: "2024-01-15",
+  },
+  {
+    id: 3,
+    service: "Spotify",
+    price: 10900,
+    cycle: "monthly",
+    startDate: "2024-02-01",
+  },
 ];
 
 // 목록 조회 (완성됨)
-app.get('/api/subscriptions', (req, res) => {
+app.get("/api/subscriptions", (req, res) => {
   res.json({ success: true, count: subscriptions.length, data: subscriptions });
 });
 
 // 단일 조회 (완성됨)
-app.get('/api/subscriptions/:id', (req, res) => {
+app.get("/api/subscriptions/:id", (req, res) => {
   const id = Number(req.params.id);
   const subscription = subscriptions.find((sub) => sub.id === id);
 
   if (!subscription) {
-    return res.status(404).json({ success: false, message: '구독을 찾을 수 없습니다' });
+    return res
+      .status(404)
+      .json({ success: false, message: "구독을 찾을 수 없습니다" });
   }
   res.json({ success: true, data: subscription });
 });
@@ -81,9 +101,70 @@ app.get('/api/subscriptions/:id', (req, res) => {
 //    }
 //
 // 8) 응답: { success: true, message: '구독이 수정되었습니다', data: 수정된데이터 }
+app.patch("/api/subscriptions/:id", (req, res) => {
+  const subscriptionId = Number(req.params.id);
+  const updates = req.body;
 
+  if (Object.keys(updates).length === 0) {
+    return res
+      .status(400)
+      .json({ success: false, message: "수정할 내용이 없습니다" });
+  }
 
+  const updatableFields = ["service", "price", "cycle", "startDate"];
+  const invalidFields = Object.keys(updates).filter(
+    (key) => !updatableFields.includes(key),
+  );
 
+  if (invalidFields.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: `수정할 수 없는 필드입니다: ${invalidFields.join(", ")}`,
+    });
+  }
+
+  if (updates.price) {
+    if (isNaN(updates.price) || 0 > updates.price) {
+      return res
+        .status(400)
+        .json({ success: false, message: "가격은 0보다 큰 숫자여야 합니다" });
+    }
+  }
+
+  if (updates.cycle) {
+    const validCycles = ["daily", "weekly", "monthly", "yearly"];
+    if (!validCycles.includes(updates.cycle)) {
+      return res.status(400).json({
+        success: false,
+        message: `구독 주기는 ${validCycles.join(", ")} 중 하나여야 합니다.`,
+      });
+    }
+  }
+
+  const index = subscriptions.findIndex(
+    (subscription) => subscription.id === subscriptionId,
+  );
+
+  if (index === -1) {
+    return res.status(404).json({
+      success: false,
+      message: "해당 구독을 찾을 수 없습니다",
+    });
+  }
+
+  subscriptions[index] = {
+    ...subscriptions[index],
+    ...updates,
+    id: subscriptionId,
+    updatedAt: new Date().toISOString(),
+  };
+
+  return res.status(200).json({
+    success: true,
+    message: "구독이 수정되었습니다",
+    data: subscriptions[index],
+  });
+});
 
 // ─────────────────────────────────────────────
 // 서버 시작
