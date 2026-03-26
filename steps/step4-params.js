@@ -113,6 +113,17 @@ app.get("/api/subscriptions/:id", (req, res) => {
 // }
 //
 // 테스트: http://localhost:8080/api/users/10/subscriptions/5
+app.get("/api/users/:userId/subscriptions/:subId", (req, res) => {
+  let { userId, subId } = req.params;
+  userId = Number(userId);
+  subId = Number(subId);
+
+  res.json({
+    userId,
+    subscriptionId: subId,
+    message: `유저 ${userId}의 구독 ${subId}번 조회`,
+  });
+});
 
 // ─────────────────────────────────────────────
 // 서버 시작
