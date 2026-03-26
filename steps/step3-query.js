@@ -136,6 +136,11 @@ app.get("/api/subscriptions", (req, res) => {
 
   // TODO 2b: cycle 필터링 (정확히 일치)
   // 테스트: ?cycle=yearly
+  if (cycle) {
+    results = results.filter(
+      (item) => item.cycle.toLowerCase() === cycle.toLowerCase(),
+    );
+  }
 
   // TODO 2c: minPrice 필터링
   // 힌트: 쿼리 파라미터는 항상 문자열이므로 Number()로 변환 필요
