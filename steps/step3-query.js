@@ -164,6 +164,22 @@ app.get("/api/subscriptions", (req, res) => {
   //
   // 힌트: results.sort((a, b) => { ... })
   // 힌트: 문자열 비교 시 .toLowerCase() 사용
+  if (sort) {
+    if (sort === "service") {
+      results = results.sort((a, b) => {
+        const upperCaseA = a.service.toUpperCase();
+        const upperCaseB = b.service.toUpperCase();
+
+        if (upperCaseA > upperCaseB) return 1;
+        if (upperCaseA < upperCaseB) return -1;
+        return 0;
+      });
+    } else if (sort === "service") {
+      order === "asc"
+        ? (results = results.sort((a, b) => a.price - b.price))
+        : (results = results.sort((a, b) => b.price - a.price));
+    }
+  }
 
   // ─────────────────────────────────────────
   // TODO 4: 페이지네이션
