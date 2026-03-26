@@ -145,9 +145,15 @@ app.get("/api/subscriptions", (req, res) => {
   // TODO 2c: minPrice 필터링
   // 힌트: 쿼리 파라미터는 항상 문자열이므로 Number()로 변환 필요
   // 테스트: ?minPrice=10000
+  if (minPrice) {
+    results = results.filter((item) => item.price >= +minPrice);
+  }
 
   // TODO 2d: maxPrice 필터링
   // 테스트: ?minPrice=10000&maxPrice=20000
+  if (maxPrice) {
+    results = results.filter((item) => item.price <= +maxPrice);
+  }
 
   // ─────────────────────────────────────────
   // TODO 3: 정렬 기능
