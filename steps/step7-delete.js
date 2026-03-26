@@ -126,6 +126,39 @@ app.delete("/api/subscriptions/:id", (req, res) => {
 //   curl -X DELETE http://localhost:8080/api/subscriptions \
 //     -H "Content-Type: application/json" \
 //     -d '{"ids": [1, 2, 999]}'
+app.delete("/api/subscriptions", (req, res) => {
+  const { ids } = req.body;
+
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(404).json({
+      success: false,
+      message: "ID 배열을 제공해주세요",
+    });
+  }
+
+  const deletedItems = [];
+  const notFoundIds = [];
+
+  ids.forEach((id) => {
+    const index = subscriptions.findIndex(
+      (subscription) => subscription.id === id,
+    );
+
+    if (index === -1) {
+      notFoundIds.push(id);
+    } else {
+      deletedItems.push(subscriptions[index]);
+      subscriptions.splice(index, 1);
+    }
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: `${deletedItems.length}개 항목이 삭제되었습니다`,
+    deleted: deletedItems,
+    notFound: notFoundIds,
+  });
+});
 
 // ─────────────────────────────────────────────
 // 서버 시작
