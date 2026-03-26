@@ -14,20 +14,38 @@
  * 실행 방법: node steps/step4-params.js
  */
 
-import express from 'express';
+import express from "express";
 
 const app = express();
 const PORT = 8080;
 
 // 임시 데이터
 const subscriptions = [
-  { id: 1, service: 'Netflix', price: 9900, cycle: 'monthly', startDate: '2024-01-01' },
-  { id: 2, service: 'YouTube Premium', price: 14900, cycle: 'monthly', startDate: '2024-01-15' },
-  { id: 3, service: 'Spotify', price: 10900, cycle: 'monthly', startDate: '2024-02-01' },
+  {
+    id: 1,
+    service: "Netflix",
+    price: 9900,
+    cycle: "monthly",
+    startDate: "2024-01-01",
+  },
+  {
+    id: 2,
+    service: "YouTube Premium",
+    price: 14900,
+    cycle: "monthly",
+    startDate: "2024-01-15",
+  },
+  {
+    id: 3,
+    service: "Spotify",
+    price: 10900,
+    cycle: "monthly",
+    startDate: "2024-02-01",
+  },
 ];
 
 // 전체 목록 조회 (이건 완성되어 있습니다)
-app.get('/api/subscriptions', (req, res) => {
+app.get("/api/subscriptions", (req, res) => {
   res.json({
     success: true,
     count: subscriptions.length,
@@ -54,9 +72,33 @@ app.get('/api/subscriptions', (req, res) => {
 //   http://localhost:8080/api/subscriptions/999  → 404
 //   http://localhost:8080/api/subscriptions/abc  → 400
 //   http://localhost:8080/api/subscriptions/-1   → 400
+app.get("/api/subscriptions/:id", (req, res) => {
+  const targetId = Number(req.params.id);
 
+  if (isNaN(targetId)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "ID는 숫자여야 합니다" });
+  }
 
+  if (0 > targetId) {
+    return res
+      .status(400)
+      .json({ success: false, message: "ID는 양수여야 합니다" });
+  }
 
+  const subscription = subscriptions.find(
+    (subscription) => subscription.id === targetId,
+  );
+
+  if (!subscription) {
+    return res
+      .status(404)
+      .json({ success: false, message: "구독을 찾을 수 없습니다" });
+  }
+
+  return res.json({ success: true, data: subscription });
+});
 
 // ─────────────────────────────────────────────
 // TODO 2: 여러 URL 파라미터
@@ -71,9 +113,6 @@ app.get('/api/subscriptions', (req, res) => {
 // }
 //
 // 테스트: http://localhost:8080/api/users/10/subscriptions/5
-
-
-
 
 // ─────────────────────────────────────────────
 // 서버 시작
