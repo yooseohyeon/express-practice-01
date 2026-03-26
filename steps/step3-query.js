@@ -128,6 +128,11 @@ app.get("/api/subscriptions", (req, res) => {
 
   // TODO 2a: service 필터링
   // service 값이 있으면 results를 필터링하세요
+  if (service) {
+    results = results.filter((item) =>
+      item.service.toLowerCase().includes(service.toLowerCase()),
+    );
+  }
 
   // TODO 2b: cycle 필터링 (정확히 일치)
   // 테스트: ?cycle=yearly
