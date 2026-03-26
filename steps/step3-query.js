@@ -200,6 +200,24 @@ app.get("/api/subscriptions", (req, res) => {
   //   data: [...]
   // }
 
+  if (page && limit) {
+    const total = results.length;
+    const totalPages = Math.ceil(total / limit);
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    results = results.slice(startIndex, endIndex);
+
+    return res.json({
+      success: true,
+      page,
+      limit,
+      total,
+      totalPages,
+      data: results,
+    });
+  }
+
   // 기본 응답
   res.json({
     success: true,
